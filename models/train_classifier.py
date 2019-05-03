@@ -26,7 +26,7 @@ import pickle
 def load_data(database_filepath):
     # load data from database
     engine = create_engine('sqlite:///{}'.format(database_filepath))
-    df = pd.read_sql_table(table_name=database_filename[:-3], con=engine)
+    df = pd.read_sql_table(table_name='disasterresponse', con=engine)
     X = df.message.values
     remove_col = ['id', 'message', 'original', 'genre']
     y = df.loc[:, ~df.columns.isin(remove_col)]
