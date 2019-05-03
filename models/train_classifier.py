@@ -71,6 +71,7 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    # evaluate
     y_pred = model.predict(X_test)
     Y_pred = pd.DataFrame(data=y_pred, 
                           index=Y_test.index, 

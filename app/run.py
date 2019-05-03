@@ -11,6 +11,7 @@ from plotly.graph_objs import Bar
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
+from collections import Counter
 
 app = Flask(__name__)
 
@@ -26,11 +27,11 @@ def tokenize(text):
     return clean_tokens
 
 # load data
-engine = create_engine('sqlite:///data/DisasterResponse.db')
+engine = create_engine('sqlite:///../data/DisasterResponse.db')
 df = pd.read_sql_table('disasterresponse', engine)
 
 # load model
-model = joblib.load("models/classifier.pkl")
+model = joblib.load("../models/classifier.pkl")
 
 
 # index webpage displays cool visuals and receives user input text for model
@@ -43,6 +44,12 @@ def index():
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
     
+    # extract Top 5 categories
+    remove_col = ['id', 'message', 'original', 'genre']
+    y = df.loc[:, ~df.columns.isin(remove_col)]
+    category_counts = y.sum().sort_values().tail()
+    category_names = list(category_counts.index)
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -61,6 +68,22 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Bar(
+                    y=category_names,
+                    x=category_counts,
+                    orientation = 'h'
+                )
+            ],
+
+            'layout': {
+                'title': 'Top 5 Categories',
+                'xaxis': {
+                    'title': "Count"
                 }
             }
         }
