@@ -67,7 +67,18 @@ def build_model():
         ('clf', MultiOutputClassifier(RandomForestClassifier()))
     ])
 
-    return pipeline
+    parameters = {
+        #'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
+        #'features__text_pipeline__vect__max_df': (0.5, 0.75, 1.0),
+        #'features__text_pipeline__vect__max_features': (None, 5000, 10000),
+        'features__text_pipeline__tfidf__use_idf': (True, False),
+        #'clf__estimator__n_estimators': [50, 100, 200],
+        'clf__estimator__min_samples_split': [2, 3, 4]
+    }
+    
+    cv = GridSearchCV(pipeline, param_grid=parameters)
+
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
