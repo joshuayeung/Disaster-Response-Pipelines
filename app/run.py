@@ -16,6 +16,17 @@ from collections import Counter
 app = Flask(__name__)
 
 def tokenize(text):
+    ''' 
+    
+    A tokenization function to process text data 
+    
+    Parameters:
+    text: a string with untokenizated sentences
+
+    Returns:
+    clean_tokens: a list of tokenization words from input sentences
+
+    '''
     tokens = word_tokenize(text)
     lemmatizer = WordNetLemmatizer()
 

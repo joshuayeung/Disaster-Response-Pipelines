@@ -24,19 +24,42 @@ from sklearn.multioutput import MultiOutputClassifier
 import pickle
 
 def load_data(database_filepath):
-    # load data from database
+    ''' 
+    
+    load data from database using database_filepath 
+    
+    Parameters:
+    database_filepath: a string contains filepath of the database
+
+    Returns:
+    X: the message column
+    y: the categories
+    category_name: the names of the categories
+
+    '''
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql_table(table_name='disasterresponse', con=engine)
     X = df.message.values
     remove_col = ['id', 'message', 'original', 'genre']
     y = df.loc[:, ~df.columns.isin(remove_col)]
+    y.loc[:,'related'] = y['related'].replace(2,1)
     category_name = y.columns
     return X, y, category_name
 
 url_regex = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
 
 def tokenize(text):
-    # Write a tokenization function to process your text data
+    ''' 
+    
+    A tokenization function to process text data 
+    
+    Parameters:
+    text: a string with untokenizated sentences
+
+    Returns:
+    clean_tokens: a list of tokenization words from input sentences
+
+    '''
     detected_urls = re.findall(url_regex, text)
     for url in detected_urls:
         text = text.replace(url, "urlplaceholder")
@@ -53,9 +76,18 @@ def tokenize(text):
 
 
 def build_model():
-    # Build a machine learning pipeline
-    # This machine pipeline take in the message column as input and 
-    # output classification results on the other 36 categories in the dataset. 
+    '''
+    
+    A machine learning pipeline takes in the message column as input and 
+    output classification results on the other 36 categories in the dataset. 
+
+    Parameters:
+    None
+
+    Returns:
+    cv: a model that uses the message column to predict classifications for 36 categories
+
+    '''
     pipeline = Pipeline([
         ('features', FeatureUnion([
             ('text_pipeline', Pipeline([
@@ -82,20 +114,57 @@ def build_model():
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    # evaluate
+    ''' 
+    
+    Evaluate the model performance by f1 score, precision and recall
+
+    Parameters:
+    model: a ML model
+    X_test: message from test set
+    Y_test: category value from test set
+    category_names: the names of the categories
+
+    Return:
+    None
+
+    '''
+
     y_pred = model.predict(X_test)
     Y_pred = pd.DataFrame(data=y_pred, 
                           index=Y_test.index, 
                           columns=category_names)
-    for col in category_names:
-        print(col, classification_report(Y_test[col], Y_pred[col]))
+    print(classification_report(Y_test, Y_pred, target_names=category_names))
 
 
 def save_model(model, model_filepath):
+    '''
+    
+    Save the model to a specified path
+    
+    Parameters:
+    model: a ML model
+    model_filepath: the file path that the model will be saved
+
+    Returns:
+    None
+
+    '''
     pickle.dump(model, open(model_filepath, 'wb'))
 
 
 def main():
+    '''
+
+    Main function that train the classifier
+
+    Parameters:
+    arg1: the file path of the database
+    arg2: the file path that the trained model will be saved
+
+    Returns:
+    None
+
+    '''
     if len(sys.argv) == 3:
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
