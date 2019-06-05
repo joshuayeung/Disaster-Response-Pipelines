@@ -1,6 +1,6 @@
 ﻿# Disaster Response Pipeline Project
 
-In this project, I applied the data pipepline skills learnt to analyze disaster data from Figure Eight to build a model for an API that classifies disaster messages. I built a machine learning pipleine to categorize emergency messages based on the needs communicated by the sender.
+I applied the data pipeline skills learned to analyze disaster data from Figure Eight to build a model for an API that classifies disaster messages. I built a machine learning pipeline to categorize emergency messages based on the needs communicated by the sender.
 
 ### Table of Contents
 
